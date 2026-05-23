@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>YOLO Upload</title>
+    <link rel="stylesheet" href="{{url_for('static', filename='style.css')}}">
+</head>
+<body>
+    <h1>Upload Image</h1>
+    <form action="/upload" method="post" enctype="multipart/form-data">
+        <input type="file" name="image">
+        <button type="submit"> Upload</button>
+
+    </form>
+</body>
+</html>
