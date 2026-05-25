@@ -1,0 +1,53 @@
+# inference/yolo_worker.py
+import time
+from ultralytics import YOLO
+
+from day_17.config import MODEL_PATH, CONF, IMG_SIZE, SLEEP_TIME
+from day_17.utils.shared_data import frame_queue, result_queue, status_data
+from day_17.utils.logger import get_logger
+
+logger = get_logger("yolo")
+def yolo_worker():
+    logger.info("Loading YOLO model")
+    model = YOLO(MODEL_PATH)
+    logger.info("YOLO model loaded")
+
+    last_time = time.time()
+    detect_count = 0
+
+    while True:
+        if frame_queue.empty():
+            time.sleep(SLEEP_TIME)
+            continue
+        frame = frame_queue.get()
+        results = model(
+            frame,
+            conf=CONF,
+            imgsz=IMG_SIZE,
+            verbose=False
+        )
+        annotated_frame = results[0].plot()
+        if result_queue.full():
+            try:
+                result_queue.get_nowwait()
+            except:
+                pass
+        result_queue.put(annotated_frame)
+
+        detect_count += 1
+        if detect_count % 30 == 0:
+            logger.info(
+                f"fps={status_data['fps']},"
+                f"frame_queue={frame_queue.qsize()},"
+                f"result_queue={result_queue.qsize()},"
+                f"detect_count={detect_count}"
+            )
+        now = time.time()
+
+        fps = 1 / (now - last_time)
+        last_time = now
+
+        status_data["fps"] = round(fps, 2)
+        status_data["result_queue_size"] = result_queue.qsize()
+        status_data["detect_count"] = detect_count
+

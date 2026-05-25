@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>Day17 工程化实时YOLO系统</title>
+</head>
+<body>
+    <h1>Day17 工程化实时YOLO系统</h1>
+    <img src="/video" width="800">
+    <h2>系统状态</h2>
+    <p>FPS: <span id="frame_queue">0</span></p>
+    <p>Frame Queue: <span id="result_queue">0</span></p>
+    <p>Detect Count: <span id="detect_count">0</span></p>
+    <script>
+        setInterval(() => {
+            fetch("/status")
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById("fps").innerText = data.fps;
+                    document.getElementById("frame_queue").innerText = data.frame_queue_size;
+                    document.getElementById("result_queue").innerText = data.result_queue_size;
+                    document.getElementById("detect_count").innerText = data.detect_count;
+                });
+        }, 1000);
+    </script>
+</body>
+</html>
