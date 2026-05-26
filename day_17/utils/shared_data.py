@@ -9,5 +9,7 @@ status_data = {
     "fps": 0,
     "frame_queue_size": 0,
     "result_queue_size": 0,
-    "detect_count": 0
+    "detect_count": 0,
+    "last_detect_time": 0,
+    "reconnect_count": 0
 }

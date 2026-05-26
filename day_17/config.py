@@ -1,6 +1,6 @@
 # config.py  负责统一管理参数
 
-CAMERA_ID = 0
+VIDEO_SOURCE = "videos/test.mp4"
 
 MODEL_PATH = "models/yolov8n.pt"
 

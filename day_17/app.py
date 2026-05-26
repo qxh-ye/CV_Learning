@@ -1,3 +1,4 @@
+import logging
 import time
 
 from flask import Flask, Response, jsonify, render_template
@@ -8,15 +9,17 @@ from day_17.camera.camera_worker import camera_worker
 from day_17.inference.yolo_worker import yolo_worker
 from day_17.utils.shared_data import result_queue, status_data
 from day_17.utils.logger import get_logger
-from day_17.config import SLEEP_TIME
+from day_17.config import SLEEP_TIME, VIDEO_SOURCE
 
 
-logger = get_logger("app")
+
 app = Flask(__name__)
+logger = get_logger("app")
+logging.getLogger("werkzeug").setLevel(logging.ERROR)
 
 @app.route("/")
 def index():
-    return render_template("index.html")
+    return render_template("index.html", video_source=VIDEO_SOURCE)
 
 
 
@@ -51,9 +54,30 @@ def video():
         mimetype="multipart/x-mixed-replace; boundary=frame"
     )
 
+@app.route("/health")
+def health():
+    now = time.time()
+
+    last_detect = status_data["last_detect_time"]
+    if now - last_detect > 5:
+        return {
+            "status": "error",
+            "message": "YOLO worker timeout"
+        }
+    return {
+        "status": "ok"
+    }
+
 @app.route("/status")
 def status():
-    return jsonify(status_data)
+    return jsonify({
+        "fps": status_data["fps"],
+        "frame_queue_size": status_data["frame_queue_size"],
+        "result_queue_size": status_data["result_queue_size"],
+        "detect_count": status_data["detect_count"],
+        "last_detect_time": status_data["last_detect_time"],
+        "reconnect_count": status_data["reconnect_count"]
+    })
 
 
 

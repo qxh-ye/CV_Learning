@@ -14,13 +14,16 @@
 
 支持：
 
-- 实时摄像头检测
+- 实时视频检测
 - Web视频流
-- FPS显示
-- Queue解耦
-- 多线程实时系统
-- Web状态接口
-- 系统日志输出
+- 多线程解耦
+- Queue实时系统
+- Logger日志系统
+- Health健康检查
+- Status状态监控
+- 视频源重连
+- 视频文件输入
+- 工程化模块拆分
 
 ---
 
@@ -29,13 +32,31 @@
 ```text
 day_17/
 │
+├── camera/
+│   ├── __init__.py
+│   └── camera_worker.py
+│
+├── inference/
+│   ├── __init__.py
+│   └── yolo_worker.py
+│
+├── models/
+│   └── yolov8n.pt
+│
+├── static/
+│
+├── templates/
+│   └── index.html
+│
+├── utils/
+│   ├── __init__.py
+│   ├── logger.py
+│   └── shared_data.py
+│
+├── videos/
+│   └── test.mp4
+│
 ├── app.py
 ├── config.py
 ├── requirements.txt
-│
-├── camera/
-├── inference/
-├── utils/
-├── templates/
-├── static/
-└── models/
+└──README.md
