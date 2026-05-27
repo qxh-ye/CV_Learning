@@ -99,3 +99,15 @@ day_17/
 ├── config.py
 ├── requirements.txt
 └──README.md
+
+## 启动项目
+
+推荐在项目根目录运行：
+
+```bash
+python -m day_17.app
+
+### Windows
+
+```bash
+run_day17.bat

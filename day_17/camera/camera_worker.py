@@ -28,7 +28,7 @@ def camera_worker():
         if not ret:
             status_data["source_status"] = "reconnecting"
             error_msg = ("Failed to read frame, reconnecting video source...")
-            logger.error(error_msg)
+            logger.warning(error_msg)
             status_data["last_error"] = error_msg
             status_data["reconnect_count"] += 1
 

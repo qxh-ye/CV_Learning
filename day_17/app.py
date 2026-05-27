@@ -9,8 +9,9 @@ from day_17.camera.camera_worker import camera_worker
 from day_17.inference.yolo_worker import yolo_worker
 from day_17.utils.shared_data import result_queue, status_data
 from day_17.utils.logger import get_logger
-from day_17.config import SLEEP_TIME, VIDEO_SOURCE
+from day_17.config import SLEEP_TIME
 from day_17.config import HOST, PORT, DEBUG
+from day_17.utils.video_utils import get_video_source
 
 
 
@@ -20,11 +21,11 @@ logging.getLogger("werkzeug").setLevel(logging.ERROR)
 
 @app.route("/")
 def index():
-    return render_template("index.html", video_source=VIDEO_SOURCE)
+    return render_template("index.html", video_source=get_video_source())
 
 
 
-def generate_frame():
+def generate_frames():
     while True:
         if result_queue.empty():
             time.sleep(SLEEP_TIME)
@@ -51,7 +52,7 @@ def generate_frame():
 @app.route("/video")
 def video():
     return Response(
-        generate_frame(),
+        generate_frames(),
         mimetype="multipart/x-mixed-replace; boundary=frame"
     )
 
