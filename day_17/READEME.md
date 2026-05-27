@@ -55,6 +55,16 @@ opencv-python
 ultralytics
 numpy
 
+## 环境变量配置
+
+项目支持通过环境变量动态修改参数。
+
+例如：
+
+```bash
+set CONF=0.3
+set IMG_SIZE=320
+
 
 ## 项目结构
 

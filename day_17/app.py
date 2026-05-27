@@ -10,6 +10,7 @@ from day_17.inference.yolo_worker import yolo_worker
 from day_17.utils.shared_data import result_queue, status_data
 from day_17.utils.logger import get_logger
 from day_17.config import SLEEP_TIME, VIDEO_SOURCE
+from day_17.config import HOST, PORT, DEBUG
 
 
 
@@ -93,8 +94,7 @@ if __name__ == "__main__":
     logger.info("Starting Flask server")
 
 
-
-    app.run(host="0.0.0.0", port=5000, debug=False, )
+    app.run(host=HOST, port=PORT, debug=DEBUG)
 
 
 

@@ -8,14 +8,14 @@ VIDEO_SOURCE = os.path.join(BASE_DIR, "videos", "test.mp4")
 VIDEO_TYPE = "video"
 RTSP_URL = "rtsp://admin:password@192.168.1.64:554/Streaming/Channels/102"
 RECONNECT_DELAY = 1
-BUFFER_SIZE = 1
+BUFFER_SIZE = int(os.getenv("BUFFER_SIZE", 1))
 
 # ===================================
 # YOLO Config
 # ===================================
 MODEL_PATH = os.path.join(BASE_DIR, "models", "yolov8n.pt")
-CONF = 0.5
-IMG_SIZE = 640
+CONF = float(os.getenv("conf", 0.5))
+IMG_SIZE = int(os.getenv("IMG_SIZE", 640))
 DETECT_INTERVAL = 1
 
 # ===================================
@@ -28,5 +28,8 @@ RESULT_QUEUE_SIZE = 5
 # System Config
 # ===================================
 SLEEP_TIME = 0.01
+HOST = os.getenv("HOST", "0.0.0.0")
+PORT = int(os.getenv("PORT", 5000))
+DEBUG = os.getenv("DEBUG", "False") == "True"
 
 
