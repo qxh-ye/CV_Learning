@@ -27,6 +27,25 @@
 
 ---
 
+## 视频源配置说明
+
+项目通过 `config.py` 中的 `VIDEO_TYPE` 控制视频输入源。
+
+### USB摄像头
+
+```python
+VIDEO_TYPE = "camera"
+VIDEO_SOURCE = 0
+
+### 本地视频文件
+VIDEO_TYPE = "video"
+VIDEO_SOURCE = "videos/test.mp4"
+
+### RTSP网络摄像头
+VIDEO_TYPE = "rtsp"
+RTSP_URL = "rtsp://admin:password@192.168.1.64:554/Streaming/Channels/102"
+
+
 ## 项目结构
 
 ```text
