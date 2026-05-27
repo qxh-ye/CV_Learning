@@ -45,6 +45,16 @@ VIDEO_SOURCE = "videos/test.mp4"
 VIDEO_TYPE = "rtsp"
 RTSP_URL = "rtsp://admin:password@192.168.1.64:554/Streaming/Channels/102"
 
+## 最小依赖说明
+
+项目核心依赖：
+
+```text
+flask
+opencv-python
+ultralytics
+numpy
+
 
 ## 项目结构
 

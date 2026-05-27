@@ -14,6 +14,8 @@
     <p>Result Queue: <span id="result_queue">0</span></p>
     <p>Detect Count: <span id="detect_count">0</span></p>
     <p>Reconnect Count: <span id="reconnect_count">0</span></p>
+    <p>Lasr Error: <span id="last_error">None</span></p>
+    <p>Source Status: <span id="source_status">init</span></p>
     <script>
         setInterval(() => {
             fetch("/status")
@@ -24,6 +26,8 @@
                     document.getElementById("result_queue").innerText = data.result_queue_size;
                     document.getElementById("detect_count").innerText = data.detect_count;
                     document.getElementById("reconnect_count").innerText = data.reconnect_count;
+                    document.getElementById("last_error").innerText = data.last_error;
+                    document.getElementById("source_status").innerText = data.source_status;
                 });
         }, 1000);
     </script>

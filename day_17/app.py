@@ -76,7 +76,9 @@ def status():
         "result_queue_size": status_data["result_queue_size"],
         "detect_count": status_data["detect_count"],
         "last_detect_time": status_data["last_detect_time"],
-        "reconnect_count": status_data["reconnect_count"]
+        "reconnect_count": status_data["reconnect_count"],
+        "last_error": status_data["last_error"],
+        "source_status": status_data["source_status"]
     })
 
 

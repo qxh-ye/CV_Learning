@@ -2,10 +2,11 @@
 # ==================================
 # Video Source Config
 # ==================================
-VIDEO_SOURCE = "videos/test.mp4"
+VIDEO_SOURCE = "videos/test1.mp4"
 VIDEO_TYPE = "video"
 RTSP_URL = "rtsp://admin:password@192.168.1.64:554/Streaming/Channels/102"
 RECONNECT_DELAY = 1
+BUFFER_SIZE = 1
 
 # ===================================
 # YOLO Config

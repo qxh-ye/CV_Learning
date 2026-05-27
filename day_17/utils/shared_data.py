@@ -11,5 +11,7 @@ status_data = {
     "result_queue_size": 0,
     "detect_count": 0,
     "last_detect_time": 0,
-    "reconnect_count": 0
+    "reconnect_count": 0,
+    "last_error": "",
+    "source_status": "init"
 }
