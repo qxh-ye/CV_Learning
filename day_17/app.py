@@ -3,16 +3,13 @@ import time
 
 from flask import Flask, Response, jsonify, render_template
 import cv2
-import threading
 
-from day_17.camera.camera_worker import camera_worker
-from day_17.inference.yolo_worker import yolo_worker
 from day_17.utils.shared_data import result_queue, status_data
 from day_17.utils.logger import get_logger
-from day_17.config import SLEEP_TIME
+from day_17.config import SLEEP_TIME, STREAM_ID, CAMERA_CONFIG
 from day_17.config import HOST, PORT, DEBUG
 from day_17.utils.video_utils import get_video_source
-
+from day_17.manager.camera_manager import CameraManager
 
 
 app = Flask(__name__)
@@ -80,20 +77,16 @@ def status():
         "last_detect_time": status_data["last_detect_time"],
         "reconnect_count": status_data["reconnect_count"],
         "last_error": status_data["last_error"],
-        "source_status": status_data["source_status"]
+        "source_status": status_data["source_status"],
+        "stream_id": STREAM_ID,
+        "camera_name": CAMERA_CONFIG["name"]
     })
 
 
 
 if __name__ == "__main__":
-    logger.info("Starting camera thread")
-    threading.Thread(target=camera_worker, daemon=True).start()
-
-    logger.info("Starting yolo thread")
-    threading.Thread(target=yolo_worker, daemon=True).start()
-
-    logger.info("Starting Flask server")
-
+    manager = CameraManager()
+    manager.start()
 
     app.run(host=HOST, port=PORT, debug=DEBUG)
 

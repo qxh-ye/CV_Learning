@@ -111,3 +111,12 @@ python -m day_17.app
 
 ```bash
 run_day17.bat
+
+## Docker 部署（基础）
+
+项目支持Docker部署。
+
+### 构建镜像
+
+```bash
+docker build -t day17-yolo .

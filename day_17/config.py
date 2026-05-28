@@ -9,6 +9,14 @@ VIDEO_TYPE = "video"
 RTSP_URL = "rtsp://admin:password@192.168.1.64:554/Streaming/Channels/102"
 RECONNECT_DELAY = 1
 BUFFER_SIZE = int(os.getenv("BUFFER_SIZE", 1))
+STREAM_ID = 0
+CAMERA_CONFIGS = [
+   {
+    "id": 0,
+    "name": "test_camera",
+    "source": VIDEO_SOURCE
+    }
+]
 
 # ===================================
 # YOLO Config

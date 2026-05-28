@@ -2,7 +2,7 @@
 import time
 from ultralytics import YOLO
 
-from day_17.config import MODEL_PATH, CONF, IMG_SIZE, SLEEP_TIME
+from day_17.config import MODEL_PATH, CONF, IMG_SIZE, SLEEP_TIME, STREAM_ID, CAMERA_CONFIG
 from day_17.utils.shared_data import frame_queue, result_queue, status_data
 from day_17.utils.logger import get_logger
 
@@ -17,10 +17,18 @@ def get_latest_frame():
 
 
 logger = get_logger("yolo")
-def yolo_worker():
-    logger.info("Loading YOLO model")
+def yolo_worker(camera_config):
+    logger.info(
+        f"[Stream {camera_config['id']}] "
+        f"[{camera_config['name']}] "
+        "Loading YOLO model"
+    )
     model = YOLO(MODEL_PATH)
-    logger.info("YOLO model loaded")
+    logger.info(
+        f"[Stream {camera_config['id']}] "
+        f"[{camera_config['name']}] "
+        "YOLO model loaded"
+    )
 
     last_time = time.time()
     detect_count = 0
@@ -56,6 +64,8 @@ def yolo_worker():
         detect_count += 1
         if detect_count % 30 == 0:
             logger.info(
+                f"[Stream {camera_config['id']}] "
+                f"[{camera_config['name']}] "
                 f"fps={status_data['fps']} |"
                 f"frame_queue={frame_queue.qsize()} |"
                 f"result_queue={result_queue.qsize()} |"

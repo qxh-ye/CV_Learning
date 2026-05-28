@@ -3,12 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <title>Day17 工程化实时YOLO系统</title>
+    <style>
+    body {
+        margin: 30px;
+        font-family: Arial, sans-serif;
+    }
+
+    img {
+        max-width: 900px;
+        width: 100%;
+        border: 1px solid #ddd;
+    }
+
+    .status {
+        margin-top: 20px;
+        line-height: 1.8;
+        font-size: 16px;
+    }
+    </style>
 </head>
 <body>
     <h1>Day17 工程化实时YOLO系统</h1>
     <p>Current Source: {{video_source}}</p>
     <img src="/video" width="800">
-    <h2>系统状态</h2>
+    <div class="status">
+        <h2>系统状态</h2>
     <p>FPS: <span id="fps">0</span></p>
     <p>Frame Queue: <span id="frame_queue">0</span></p>
     <p>Result Queue: <span id="result_queue">0</span></p>
@@ -16,6 +35,10 @@
     <p>Reconnect Count: <span id="reconnect_count">0</span></p>
     <p>Lasr Error: <span id="last_error">None</span></p>
     <p>Source Status: <span id="source_status">init</span></p>
+    <p>Stream ID: <span id="stream_id">0</span></p>
+    <p>Camera Name: <span id="camera_name">0</span></p>
+    </div>
+
     <script>
         setInterval(() => {
             fetch("/status")
@@ -28,6 +51,8 @@
                     document.getElementById("reconnect_count").innerText = data.reconnect_count;
                     document.getElementById("last_error").innerText = data.last_error;
                     document.getElementById("source_status").innerText = data.source_status;
+                    document.getElementById("stream_id").innerText = data.stream_id;
+                    document.getElementById("camera_name").innerText = data.camera_name;
                 });
         }, 1000);
     </script>
