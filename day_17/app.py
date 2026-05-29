@@ -7,7 +7,6 @@ import cv2
 from day_17.utils.logger import get_logger
 from day_17.config import SLEEP_TIME
 from day_17.config import HOST, PORT, DEBUG
-
 from day_17.manager.camera_manager import CameraManager
 
 
@@ -19,15 +18,18 @@ manager = CameraManager()
 
 @app.route("/")
 def index():
-    context = manager.get_context(0)
-    return render_template("index.html", video_source=context.camera_config["source"])
+    return render_template(
+        "index.html",
+        cameras=[
+            context.camera_config
+            for context in manager.contexts
+        ]
+    )
 
-
-
-def generate_frames():
+def generate_frames(stream_id):
 
     while True:
-        context = manager.get_context(0)
+        context = manager.get_context(stream_id=stream_id)
         if context is None:
             time.sleep(SLEEP_TIME)
             continue
@@ -54,10 +56,10 @@ def generate_frames():
                 b"\r\n"
         )
 
-@app.route("/video")
-def video():
+@app.route("/video/<int:stream_id>")
+def video(stream_id):
     return Response(
-        generate_frames(),
+        generate_frames(stream_id),
         mimetype="multipart/x-mixed-replace; boundary=frame"
     )
 
@@ -76,9 +78,16 @@ def health():
         "status": "ok"
     }
 
-@app.route("/status")
-def status():
-    context = manager.get_context(0)
+@app.route("/status/<int:stream_id>")
+def status(stream_id):
+    context = manager.get_context(stream_id=stream_id)
+
+    if context is None:
+        return jsonify({
+            "status": "error",
+            "message": "context not found"
+        })
+
     return jsonify({
         "fps": context.fps,
         "frame_queue_size": context.frame_queue.qsize(),

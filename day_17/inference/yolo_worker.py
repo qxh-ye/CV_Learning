@@ -2,7 +2,7 @@
 import time
 from ultralytics import YOLO
 
-from day_17.config import MODEL_PATH, CONF, IMG_SIZE, SLEEP_TIME
+from day_17.config import MODEL_PATH, CONF, IMG_SIZE, SLEEP_TIME, DETECT_INTERVAL
 from day_17.utils.logger import get_logger
 
 
@@ -32,15 +32,22 @@ def yolo_worker(context):
     )
 
     last_time = time.time()
-
+    frame_id = 0
     while True:
         if context.frame_queue.empty():
             time.sleep(SLEEP_TIME)
             continue
         frame = get_latest_frame(context)
+
         if frame is None:
             time.sleep(SLEEP_TIME)
             continue
+
+        frame_id += 1
+        if frame_id % DETECT_INTERVAL != 0:
+            time.sleep(SLEEP_TIME)
+            continue
+
         try:
             results = model(
                 frame,

@@ -11,10 +11,15 @@ RECONNECT_DELAY = 1
 BUFFER_SIZE = int(os.getenv("BUFFER_SIZE", 1))
 STREAM_ID = 0
 CAMERA_CONFIGS = [
-   {
-    "id": 0,
-    "name": "test_camera",
-    "source": VIDEO_SOURCE
+    {
+        "id": 0,
+        "name": "test_camera0",
+        "source": VIDEO_SOURCE
+    },
+    {
+        "id": 1,
+        "name": "test_camera1",
+        "source": VIDEO_SOURCE
     }
 ]
 
@@ -23,8 +28,8 @@ CAMERA_CONFIGS = [
 # ===================================
 MODEL_PATH = os.path.join(BASE_DIR, "models", "yolov8n.pt")
 CONF = float(os.getenv("conf", 0.5))
-IMG_SIZE = int(os.getenv("IMG_SIZE", 640))
-DETECT_INTERVAL = 1
+IMG_SIZE = int(os.getenv("IMG_SIZE", 320))
+DETECT_INTERVAL = 2
 
 # ===================================
 # Queue Config

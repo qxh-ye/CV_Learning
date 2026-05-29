@@ -2,59 +2,117 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>Day17 工程化实时YOLO系统</title>
+    <title>Multi Camera YOLO</title>
     <style>
-    body {
-        margin: 30px;
-        font-family: Arial, sans-serif;
-    }
 
-    img {
-        max-width: 900px;
-        width: 100%;
-        border: 1px solid #ddd;
-    }
+body {
+    margin: 20px;
+    background: #f5f5f5;
+    font-family: Arial, sans-serif;
+}
 
-    .status {
-        margin-top: 20px;
-        line-height: 1.8;
-        font-size: 16px;
-    }
-    </style>
+h1 {
+    text-align: center;
+}
+
+.camera-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.camera-card {
+    background: white;
+    border-radius: 10px;
+    padding: 15px;
+
+    box-shadow:
+        0 2px 8px rgba(0,0,0,0.1);
+
+    width: calc(50% - 20px);
+    box-sizing: border-box;
+}
+
+.camera-card h2 {
+    margin-top: 0;
+}
+
+.camera-card img {
+     width: 100%;
+    max-height: 420px;
+    object-fit: contain;
+    background: black;
+    border-radius: 8px;
+}
+
+.status {
+    margin-top: 10px;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, 1fr);
+
+    gap: 8px;
+
+    font-size: 15px;
+}
+
+.status p {
+    margin: 0;
+}
+
+</style>
 </head>
 <body>
-    <h1>Day17 工程化实时YOLO系统</h1>
-    <p>Current Source: {{video_source}}</p>
-    <img src="/video" width="800">
+    <h1>Multi Camera YOLO System</h1>
+    <div class="camera-grid">
+    {% for camera in cameras %}
+    <div class="camera-card">
+        <h2>{{ camera["name"] }}</h2>
+        <p>Source: {{ camera["source"] }}</p>
+        <img src="/video/{{ camera['id'] }}" width="800">
+
     <div class="status">
-        <h2>系统状态</h2>
-    <p>FPS: <span id="fps">0</span></p>
-    <p>Frame Queue: <span id="frame_queue">0</span></p>
-    <p>Result Queue: <span id="result_queue">0</span></p>
-    <p>Detect Count: <span id="detect_count">0</span></p>
-    <p>Reconnect Count: <span id="reconnect_count">0</span></p>
-    <p>Lasr Error: <span id="last_error">None</span></p>
-    <p>Source Status: <span id="source_status">init</span></p>
-    <p>Stream ID: <span id="stream_id">0</span></p>
-    <p>Camera Name: <span id="camera_name">0</span></p>
+        <h3>系统状态</h3>
+    <p>FPS: <span id="fps_{{camera['id']}}">0</span></p>
+    <p>Frame Queue: <span id="frame_queue_{{camera['id']}}">0</span></p>
+    <p>Result Queue: <span id="result_queue_{{camera['id']}}">0</span></p>
+    <p>Detect Count: <span id="detect_count_{{camera['id']}}">0</span></p>
+    <p>Reconnect Count: <span id="reconnect_count_{{camera['id']}}">0</span></p>
+    <p>Lasr Error: <span id="last_error_{{camera['id']}}">None</span></p>
+    <p>Source Status: <span id="source_status_{{camera['id']}}" style="color:green;font-weight:bold;">init</span></p>
+    <p>Stream ID: <span id="stream_id_{{camera['id']}}">{{camera["id"]}}</span></p>
+    <p>Camera Name: <span id="camera_name_{{camera['id']}}">{{camera["name"]}}</span></p>
+    </div>
+    </div>
+    {% endfor %}
     </div>
 
     <script>
-        setInterval(() => {
-            fetch("/status")
+    const cameraIds = [
+        {% for camera in cameras %}
+            {{ camera["id"] }},
+        {% endfor %}
+    ];
+
+    setInterval(() => {
+        cameraIds.forEach(id => {
+            fetch(`/status/${id}`)
                 .then(response => response.json())
                 .then(data => {
-                    document.getElementById("fps").innerText = data.fps;
-                    document.getElementById("frame_queue").innerText = data.frame_queue_size;
-                    document.getElementById("result_queue").innerText = data.result_queue_size;
-                    document.getElementById("detect_count").innerText = data.detect_count;
-                    document.getElementById("reconnect_count").innerText = data.reconnect_count;
-                    document.getElementById("last_error").innerText = data.last_error;
-                    document.getElementById("source_status").innerText = data.source_status;
-                    document.getElementById("stream_id").innerText = data.stream_id;
-                    document.getElementById("camera_name").innerText = data.camera_name;
+                    document.getElementById(`fps_${id}`).innerText = data.fps;
+                    document.getElementById(`frame_queue_${id}`).innerText = data.frame_queue_size;
+                    document.getElementById(`result_queue_${id}`).innerText = data.result_queue_size;
+                    document.getElementById(`detect_count_${id}`).innerText = data.detect_count;
+                    document.getElementById(`reconnect_count_${id}`).innerText = data.reconnect_count;
+                    document.getElementById(`last_error_${id}`).innerText = data.last_error || "None";
+                    document.getElementById(`source_status_${id}`).innerText = data.source_status;
+                    document.getElementById(`stream_id_${id}`).innerText = data.stream_id;
+                    document.getElementById(`camera_name_${id}`).innerText = data.camera_name;
                 });
-        }, 1000);
-    </script>
+        });
+    }, 1000);
+</script>
 </body>
 </html>
