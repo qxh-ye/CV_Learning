@@ -2,22 +2,23 @@
 import time
 from ultralytics import YOLO
 
-from day_17.config import MODEL_PATH, CONF, IMG_SIZE, SLEEP_TIME, STREAM_ID, CAMERA_CONFIG
-from day_17.utils.shared_data import frame_queue, result_queue, status_data
+from day_17.config import MODEL_PATH, CONF, IMG_SIZE, SLEEP_TIME
 from day_17.utils.logger import get_logger
 
 
-def get_latest_frame():
+
+def get_latest_frame(context):
     frame = None
 
-    while not frame_queue.empty():
-        frame = frame_queue.get()
+    while not context.frame_queue.empty():
+        frame = context.frame_queue.get()
 
     return frame
 
 
 logger = get_logger("yolo")
-def yolo_worker(camera_config):
+def yolo_worker(context):
+    camera_config = context.camera_config
     logger.info(
         f"[Stream {camera_config['id']}] "
         f"[{camera_config['name']}] "
@@ -31,13 +32,12 @@ def yolo_worker(camera_config):
     )
 
     last_time = time.time()
-    detect_count = 0
 
     while True:
-        if frame_queue.empty():
+        if context.frame_queue.empty():
             time.sleep(SLEEP_TIME)
             continue
-        frame = get_latest_frame()
+        frame = get_latest_frame(context)
         if frame is None:
             time.sleep(SLEEP_TIME)
             continue
@@ -54,30 +54,33 @@ def yolo_worker(camera_config):
             time.sleep(SLEEP_TIME)
             continue
 
-        if result_queue.full():
+        while not context.result_queue.empty():
             try:
-                result_queue.get_nowwait()
-            except:
-                pass
-        result_queue.put(annotated_frame)
+                context.result_queue.get(False)
+            except Exception as e:
+                logger.error(f"Result queue error: {e}")
+                break
+        context.result_queue.put(annotated_frame)
 
-        detect_count += 1
-        if detect_count % 30 == 0:
+        now = time.time()
+        delta = now - last_time
+        if delta > 0:
+            context.fps = round(1 / delta, 2)
+
+        last_time = now
+        if context.detect_count % 30 == 0:
             logger.info(
                 f"[Stream {camera_config['id']}] "
                 f"[{camera_config['name']}] "
-                f"fps={status_data['fps']} |"
-                f"frame_queue={frame_queue.qsize()} |"
-                f"result_queue={result_queue.qsize()} |"
-                f"detect_count={detect_count}"
+                f"fps={context.fps} |"
+                f"frame_queue={context.frame_queue.qsize()} |"
+                f"result_queue={context.result_queue.qsize()} |"
+                f"detect_count={context.detect_count}"
             )
-        status_data["last_detect_time"] = time.time()
-        now = time.time()
 
-        fps = 1 / (now - last_time)
-        last_time = now
+        context.detect_count += 1
+        context.last_detect_time = time.time()
+        context.frame_queue_size = context.frame_queue.qsize()
+        context.result_queue_size = context.result_queue.qsize()
 
-        status_data["fps"] = round(fps, 2)
-        status_data["result_queue_size"] = result_queue.qsize()
-        status_data["detect_count"] = detect_count
 
