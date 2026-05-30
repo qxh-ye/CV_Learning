@@ -2,15 +2,17 @@
 
 ## 项目介绍
 
-基于：
+基于 Flask + YOLOv8 的多路视频监控平台
 
-- Flask
-- YOLOv8
-- OpenCV
-- 多线程
-- Queue
-
-实现的实时视频分析系统。
+实现：
+- 多路视频流管理
+- CameraManager调度
+- 多线程采集
+- YOLO实时检测
+- 状态监控Dashboard
+- 自动重连机制
+- 日志系统
+- 配置管理
 
 支持：
 
