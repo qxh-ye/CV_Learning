@@ -84,6 +84,7 @@ h1 {
     <p>Source Status: <span id="source_status_{{camera['id']}}" style="color:green;font-weight:bold;">init</span></p>
     <p>Stream ID: <span id="stream_id_{{camera['id']}}">{{camera["id"]}}</span></p>
     <p>Camera Name: <span id="camera_name_{{camera['id']}}">{{camera["name"]}}</span></p>
+    <p>Uptime: <span id="uptime_{{camera['id']}}">0</span>s</p>
     </div>
     </div>
     {% endfor %}
@@ -110,6 +111,7 @@ h1 {
                     document.getElementById(`source_status_${id}`).innerText = data.source_status;
                     document.getElementById(`stream_id_${id}`).innerText = data.stream_id;
                     document.getElementById(`camera_name_${id}`).innerText = data.camera_name;
+                    document.getElementById(`uptime_${id}`).innerText = data.uptime;
                 });
         });
     }, 1000);

@@ -1,3 +1,4 @@
+import time
 from queue import Queue
 
 class CameraContext:
@@ -17,4 +18,6 @@ class CameraContext:
         self.last_error = ""
 
         self.fps = 0
+
+        self.start_time = time.time()
 

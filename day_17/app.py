@@ -81,7 +81,7 @@ def health():
 @app.route("/status/<int:stream_id>")
 def status(stream_id):
     context = manager.get_context(stream_id=stream_id)
-
+    uptime = int(time.time() - context.start_time)
     if context is None:
         return jsonify({
             "status": "error",
@@ -98,7 +98,8 @@ def status(stream_id):
         "last_error": context.last_error,
         "source_status": context.source_status,
         "stream_id": context.camera_config["id"],
-        "camera_name": context.camera_config["name"]
+        "camera_name": context.camera_config["name"],
+        "uptime": uptime
     })
 
 
