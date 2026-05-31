@@ -14,12 +14,8 @@ CAMERA_CONFIGS = [
     {
         "id": 0,
         "name": "test_camera0",
-        "source": VIDEO_SOURCE
-    },
-    {
-        "id": 1,
-        "name": "test_camera1",
-        "source": VIDEO_SOURCE
+        "source": VIDEO_SOURCE,
+	    "type": "video"
     }
 ]
 

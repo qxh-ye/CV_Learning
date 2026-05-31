@@ -1,5 +1,5 @@
 import time
-
+import cv2
 from day_17.config import SLEEP_TIME, VIDEO_TYPE, RECONNECT_DELAY
 from day_17.utils.logger import get_logger
 from day_17.utils.video_utils import get_video_source, open_video_capture
@@ -30,6 +30,17 @@ def camera_worker(context):
 
         ret, frame = cap.read()
         if not ret:
+            if camera_config.get("type", "video") == "video":
+                logger.warning(
+                    f"[Stream {camera_config['id']}] "
+                    f"[{camera_config['name']}] "
+                    f"Video ended, restart from first frame"
+                )
+                cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
+                context.source_status = "running"
+                context.last_error = ""
+                time.sleep(SLEEP_TIME)
+                continue
             context.source_status = "reconnecting"
             error_msg = (
                 f"[Stream {camera_config['id']}] "
@@ -45,6 +56,9 @@ def camera_worker(context):
             cap = open_video_capture(camera_config=camera_config)
             if cap.isOpened():
                 context.source_status = "running"
+            else:
+                context.source_status = "error"
+            continue
 
         while not context.frame_queue.empty():
             try:
