@@ -12,7 +12,7 @@ def camera_worker(context):
 
     cap = open_video_capture(camera_config=camera_config)
     context.source_status = "running"
-    while True:
+    while context.running:
         if not cap.isOpened():
             context.source_status = "error"
             error_msg = (
@@ -75,3 +75,9 @@ def camera_worker(context):
 
         context.frame_queue_size = context.frame_queue.qsize()
         time.sleep(SLEEP_TIME)
+
+    logger.info(
+        f"[Stream {context.camera_config['id']}] "
+        f"[{context.camera_config['name']}] "
+        "camera worker stopped"
+    )

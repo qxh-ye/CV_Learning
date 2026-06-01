@@ -33,7 +33,7 @@ def yolo_worker(context):
 
     last_time = time.time()
     frame_id = 0
-    while True:
+    while context.running:
         if context.frame_queue.empty():
             time.sleep(SLEEP_TIME)
             continue
@@ -98,4 +98,8 @@ def yolo_worker(context):
         context.frame_queue_size = context.frame_queue.qsize()
         context.result_queue_size = context.result_queue.qsize()
 
-
+    logger.info(
+        f"[Stream {context.camera_config['id']}] "
+        f"[{context.camera_config['name']}] "
+        "yolo worker stopped"
+    )

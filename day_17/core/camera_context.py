@@ -34,4 +34,6 @@ class CameraContext:
 
         self.warning_message = ""
 
+        self.running = True
+
 

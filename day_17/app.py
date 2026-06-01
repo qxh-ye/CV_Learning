@@ -3,7 +3,7 @@ import time
 import os
 import psutil
 
-from flask import Flask, Response, jsonify, render_template
+from flask import Flask, Response, jsonify, render_template, request
 import cv2
 
 from day_17.utils.logger import get_logger
@@ -141,6 +141,56 @@ def summary():
         "warning_cameras": warning_cameras,
         "error_cameras": error_cameras
     })
+
+@app.route("/camera/add", methods=["POST"])
+def add_camera():
+    camera_config = request.get_json()
+
+    if camera_config is None:
+        return jsonify({
+            "status": "error",
+            "message": "invalid json"
+        }), 400
+
+    try:
+        context = manager.add_camera(camera_config=camera_config)
+
+        return jsonify({
+            "status": "success",
+            "message": "camera added",
+            "camera": context.camera_config
+        })
+    except ValueError as e:
+        return jsonify({
+            "status": "error",
+            "message": str(e)
+        }), 400
+
+@app.route("/camera/remove", methods=["POST"])
+def remove_camera():
+    data = request.get_json()
+
+    if data is None:
+        return jsonify({
+            "status": "error",
+            "message": "missing camera id"
+        }), 400
+
+    stream_id = data.get("id")
+
+    try:
+        context = manager.remove_camera(stream_id=stream_id)
+
+        return jsonify({
+            "status": "success",
+            "message": "camera removed",
+            "camera": context.camera_config
+        })
+    except ValueError as e:
+        return jsonify({
+            "status": "error",
+            "message": str(e)
+        }), 400
 
 @app.route("/status/<int:stream_id>")
 def status(stream_id):

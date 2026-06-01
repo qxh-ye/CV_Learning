@@ -52,3 +52,53 @@ class CameraManager:
     def get_all_contexts(self):
         return self.contexts
 
+    def add_camera(self, camera_config):
+        if self.get_context(camera_config["id"]) is not None:
+            raise ValueError(
+                f"Camera id {camera_config['id']} already exists"
+            )
+        context = CameraContext(camera_config=camera_config)
+        self.contexts.append(context)
+
+        logger.info(
+            f"Adding stream: "
+            f"{camera_config['id']} "
+            f"{camera_config['name']}"
+        )
+
+        camera_thread = threading.Thread(
+            target=camera_worker,
+            args=(context,),
+            daemon=True
+        )
+
+        yolo_thread = threading.Thread(
+            target=yolo_worker,
+            args=(context,),
+            daemon=True
+        )
+
+        camera_thread.start()
+        yolo_thread.start()
+
+        self.camera_threads.append(camera_thread)
+        self.yolo_threads.append(yolo_thread)
+
+        return context
+
+    def remove_camera(self, stream_id):
+        context = self.get_context(stream_id)
+        if context is None:
+            raise ValueError(
+                f"Camera {stream_id} not found"
+            )
+        context.running = False
+        context.source_status = "stopped"
+        self.contexts.remove(context)
+
+        logger.info(
+            f"Remove stream: {stream_id}"
+        )
+        return context
+
+
