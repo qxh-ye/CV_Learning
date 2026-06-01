@@ -1,9 +1,9 @@
 #!/bin/bash
 
-cd ~/cv_project
+cd /mnt/hgfs/demo
 
-./scripts/stop.sh
+./day_17/scripts/stop.sh
 sleep 2
-./scripts/start_gunicorn.sh
+./day_17/scripts/start_gunicorn.sh
 
 echo "Gunicorn YOLO service restarted"

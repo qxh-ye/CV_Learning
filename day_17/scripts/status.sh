@@ -1,12 +1,8 @@
 #!/bin/bash
 
 echo "=============Gunicorn=============="
-ps -ef | grep day_17.app | grep -v grep
+ps -ef | grep gunicorn | grep -v grep
 
 echo
-echo "==============Nginx================"
-systemctl is-active nginx
-
-echo
-echo "==============Port================="
+echo "=============Port 5000============="
 ss -tlnp | grep 5000

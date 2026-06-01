@@ -11,6 +11,7 @@ class CameraContext:
         self.result_queue_size = 0
 
         self.detect_count = 0
+        self.read_frames = 0
         self.reconnect_count = 0
 
         self.source_status = "init"
@@ -18,6 +19,19 @@ class CameraContext:
         self.last_error = ""
 
         self.fps = 0
+        self.inference_time = 0
 
         self.start_time = time.time()
+        self.system_cpu = 0
+        self.process_cpu = 0
+
+        self.infer_frames = 0
+
+        self.start_datetime = time.strftime(
+            "%Y-%m-%d %H:%M:%S",
+            time.localtime()
+        )
+
+        self.warning_message = ""
+
 

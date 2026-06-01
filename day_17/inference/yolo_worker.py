@@ -48,6 +48,8 @@ def yolo_worker(context):
             time.sleep(SLEEP_TIME)
             continue
 
+        start = time.time()
+
         try:
             results = model(
                 frame,
@@ -55,7 +57,13 @@ def yolo_worker(context):
                 imgsz=IMG_SIZE,
                 verbose=False
             )
+            end = time.time()
+            context.inference_time = round(
+                (end - start) * 1000,
+                2
+            )
             annotated_frame = results[0].plot()
+            context.infer_frames += 1
         except Exception as e:
             logger.error(f"YOLO inference failed: {e}")
             time.sleep(SLEEP_TIME)

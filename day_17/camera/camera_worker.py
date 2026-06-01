@@ -41,6 +41,7 @@ def camera_worker(context):
                 context.last_error = ""
                 time.sleep(SLEEP_TIME)
                 continue
+
             context.source_status = "reconnecting"
             error_msg = (
                 f"[Stream {camera_config['id']}] "
@@ -59,6 +60,9 @@ def camera_worker(context):
             else:
                 context.source_status = "error"
             continue
+
+        if ret:
+            context.read_frames += 1
 
         while not context.frame_queue.empty():
             try:

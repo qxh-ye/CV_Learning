@@ -62,6 +62,25 @@ h1 {
     margin: 0;
 }
 
+.log-panel {
+    margin: 30px auto;
+    padding: 20px;
+    background: #111;
+    color: #00ff66;
+    border-radius: 10px;
+    font-family: Consolas, monospace;
+    max-width: 1100px;
+    box-sizing: border-box;
+}
+
+.log-panel pre {
+    max-height: 300px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
 </style>
 </head>
 <body>
@@ -85,9 +104,28 @@ h1 {
     <p>Stream ID: <span id="stream_id_{{camera['id']}}">{{camera["id"]}}</span></p>
     <p>Camera Name: <span id="camera_name_{{camera['id']}}">{{camera["name"]}}</span></p>
     <p>Uptime: <span id="uptime_{{camera['id']}}">0</span>s</p>
+    <p>Process CPU: <span id="process_cpu_{{camera['id']}}">0</span>%</p>
+    <p>System Cpu: <span id="system_cpu_{{camera['id']}}">0</span>%</p>
+    <p>Memory: <span id="memory_mb_{{camera['id']}}">0</span>MB</p>
+    <p>Inference: <span id="inference_time_{{camera['id']}}">0</span>ms</p>
+    <p>Read Frames: <span id="read_frames_{{camera['id']}}">0</span></p>
+    <p>Average Read Fps: <span id="average_read_fps_{{camera['id']}}">0</span></p>
+    <p>Infer Frames : <span id="infer_frames_{{camera['id']}}">0</span></p>
+    <p>Average Infer Fps: <span id="average_infer_fps_{{camera['id']}}">0</span></p>
+    <p>Detect Rate: <span id="detect_rate_{{camera['id']}}">0</span></p>
+    <p>Health: <span id="health_status_{{camera['id']}}">UNKNOWN</span></p>
+    <p>Last Detect Time: <span id="last_detect_time_text_{{camera['id']}}">None</span></p>
+    <p>Start Datetime: <span id="start_datetime_{{camera['id']}}"></span></p>
+    <p>Uptime Minute: <span id="uptime_minute_{{camera['id']}}"></span></p>
+    <p>Detect Per Second: <span id="detect_per_second_{{camera['id']}}"></span></p>
+    <p>Warning Message: <span id="warning_message_{{camera['id']}}">None</span></p>
     </div>
     </div>
     {% endfor %}
+    </div>
+    <div class="log-panel">
+        <h2>系统日志</h2>
+        <pre id="log_content">Loading logs...</pre>
     </div>
 
     <script>
@@ -112,9 +150,53 @@ h1 {
                     document.getElementById(`stream_id_${id}`).innerText = data.stream_id;
                     document.getElementById(`camera_name_${id}`).innerText = data.camera_name;
                     document.getElementById(`uptime_${id}`).innerText = data.uptime;
+                    document.getElementById(`process_cpu_${id}`).innerText = data.process_cpu;
+                    document.getElementById(`system_cpu_${id}`).innerText = data.system_cpu;
+                    document.getElementById(`memory_mb_${id}`).innerText = data.memory_mb;
+                    document.getElementById(`inference_time_${id}`).innerText = data.inference_time;
+                    document.getElementById(`read_frames_${id}`).innerText = data.read_frames;
+                    document.getElementById(`average_read_fps_${id}`).innerText = data.average_read_fps;
+                    document.getElementById(`infer_frames_${id}`).innerText = data.infer_frames;
+                    document.getElementById(`average_infer_fps_${id}`).innerText = data.average_infer_fps;
+                    document.getElementById(`detect_rate_${id}`).innerText = data.detect_rate;
+                    document.getElementById(`health_status_${id}`).innerText = data.health_status;
+                    document.getElementById(`last_detect_time_text_${id}`).innerText = data.last_detect_time_text;
+                    document.getElementById(`start_datetime_${id}`).innerText = data.start_datetime;
+                    document.getElementById(`uptime_minute_${id}`).innerText = data.uptime_minute;
+                    document.getElementById(`detect_per_second_${id}`).innerText = data.detect_per_second;
+                    let warningElement = document.getElementById(`warning_message_${id}`);
+                    warningElement.innerText = data.warning_message;
+                    if (data.health_status === "OK"){
+                        warningElement.style.color = "green";
+                    }
+                    else if (data.health_status === "WARNING") {
+                        warningElement.style.color = "orange";
+                    }
+                    else{
+                        warningElement.style.color = "red"
+                    }
                 });
         });
     }, 1000);
+
+   function updateLogs() {
+    fetch('/logs')
+        .then(response => response.json())
+        .then(data => {
+
+            const logElement =
+                document.getElementById("log_content");
+
+            logElement.innerText =
+                data.logs.join("");
+
+            logElement.scrollTop =
+                logElement.scrollHeight;
+        });
+}
+
+setInterval(updateLogs, 3000);
+updateLogs();
 </script>
 </body>
 </html>

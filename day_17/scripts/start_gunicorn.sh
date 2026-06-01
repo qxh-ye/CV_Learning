@@ -1,8 +1,8 @@
 #!/bin/bash 
 
-cd ~/cv_project
+cd /mnt/hgfs/demo
 
-source venv/bin/activate
+source ~/cv_project/venv/bin/activate
 
 nohup gunicorn \
 -w 1 \
