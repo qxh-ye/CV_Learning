@@ -55,6 +55,14 @@ HOST = os.getenv("HOST", "0.0.0.0")
 PORT = int(os.getenv("PORT", 5000))
 DEBUG = os.getenv("DEBUG", "False") == "True"
 
+# ===================================
+# Warning Config
+# ===================================
+MEMORY_WARNING_MB = 1000
+CPU_WARNING_PERCENT = 80
+FPS_WARNING = 5
+RECONNECT_WARNING_COUNT = 5
+
 
 
 

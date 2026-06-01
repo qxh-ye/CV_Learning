@@ -123,4 +123,23 @@ run_day17.bat
 ```bash
 docker build -t day17-yolo .
 
+# Progress
+
+## v1.1
+
+- Multi Camera Support
+- Flask Dashboard
+- System Monitoring
+- Health Check
+- Warning System
+- Log Viewer
+- Linux Deployment
+- Gunicorn Deployment
+
+Stress Test:
+
+1 Camera -> 20 FPS
+2 Camera -> 11 FPS
+3 Camera -> 9 FPS
+
 

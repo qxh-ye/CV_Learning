@@ -7,7 +7,7 @@ from flask import Flask, Response, jsonify, render_template
 import cv2
 
 from day_17.utils.logger import get_logger
-from day_17.config import SLEEP_TIME
+from day_17.config import SLEEP_TIME, MEMORY_WARNING_MB, CPU_WARNING_PERCENT, FPS_WARNING, RECONNECT_WARNING_COUNT
 from day_17.config import HOST, PORT, DEBUG
 from day_17.manager.camera_manager import CameraManager
 
@@ -101,6 +101,47 @@ def health():
         "status": "ok"
     }
 
+@app.route("/cameras")
+def cameras():
+    return jsonify([
+        {
+            "id": context.camera_config["id"],
+            "name": context.camera_config["name"],
+            "source": context.camera_config["source"],
+            "type": context.camera_config["type"],
+            "status": context.source_status
+        }
+        for context in manager.get_all_contexts()
+    ])
+
+@app.route("/summary")
+def summary():
+    contexts = manager.get_all_contexts()
+
+    total_cameras = len(contexts)
+
+    running_cameras = sum(
+        1 for context in contexts
+        if context.source_status == "running"
+    )
+
+    warning_cameras = sum(
+        1 for context in contexts
+        if context.warning_message != "None"
+    )
+
+    error_cameras = sum(
+        1 for context in contexts
+        if context.source_status != "running"
+    )
+
+    return jsonify({
+        "total_cameras": total_cameras,
+        "running_cameras": running_cameras,
+        "warning_cameras": warning_cameras,
+        "error_cameras": error_cameras
+    })
+
 @app.route("/status/<int:stream_id>")
 def status(stream_id):
     context = manager.get_context(stream_id=stream_id)
@@ -137,15 +178,6 @@ def status(stream_id):
         2
     )if context.infer_frames > 0 else 0
 
-    if context.source_status != "running":
-        health_status = "ERROR"
-    elif context.last_error:
-        health_status = "WARNING"
-    elif average_infer_fps < 5:
-        health_status = "WARNING"
-    else:
-        health_status = "OK"
-
     if context.last_detect_time:
         last_detect_time_text = time.strftime(
             "%H:%M:%S",
@@ -161,14 +193,28 @@ def status(stream_id):
         2
     )if uptime > 0 else 0
 
-    warning_message = ""
+    warning_messages = []
 
-    if average_infer_fps < 10:
-        warning_message = "LOW_FPS"
-    if context.reconnect_count > 5:
-        warning_message = "TOO_MANY_RECONNECT"
-    if memory_mb > 1000:
-        warning_message = "HIGH_MEMORY_USAGE"
+    if average_infer_fps < FPS_WARNING:
+        warning_messages.append("LOW_FPS")
+
+    if context.reconnect_count > RECONNECT_WARNING_COUNT:
+        warning_messages.append("TOO_MANY_RECONNECT")
+
+    if memory_mb > MEMORY_WARNING_MB:
+        warning_messages.append("HIGH_MEMORY_USAGE")
+
+    if context.system_cpu > CPU_WARNING_PERCENT:
+        warning_messages.append("HIGH_CPU_USAGE")
+
+    warning_message = ",".join(warning_messages) if warning_messages else "None"
+
+    if context.source_status != "running":
+        health_status = "ERROR"
+    elif warning_message != "None":
+        health_status = "WARNING"
+    else:
+        health_status = "OK"
 
     return jsonify({
         "fps": context.fps,
@@ -198,7 +244,6 @@ def status(stream_id):
         "detect_per_second": detect_per_second,
         "warning_message": warning_message
     })
-
 
 
 if __name__ == "__main__":

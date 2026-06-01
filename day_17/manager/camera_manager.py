@@ -48,3 +48,7 @@ class CameraManager:
             if context.camera_config["id"] == stream_id:
                 return context
         return None
+
+    def get_all_contexts(self):
+        return self.contexts
+
