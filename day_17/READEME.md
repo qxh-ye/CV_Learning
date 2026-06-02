@@ -1,145 +1,258 @@
-# Day17 实时YOLO Web系统（工程化版）
+# Multi-Camera YOLO Monitoring System
 
-## 项目介绍
+## 项目简介
 
-基于 Flask + YOLOv8 的多路视频监控平台
+基于 Flask + YOLOv8 + OpenCV 构建的多路视频实时监控平台。
 
-实现：
-- 多路视频流管理
-- CameraManager调度
-- 多线程采集
-- YOLO实时检测
-- 状态监控Dashboard
-- 自动重连机制
-- 日志系统
-- 配置管理
+项目支持多路视频流管理、YOLO实时目标检测、Dashboard监控面板、动态摄像头管理、告警系统以及 Linux 部署。
 
-支持：
+该项目主要用于学习和实践：
 
-- 实时视频检测
-- Web视频流
-- 多线程解耦
-- Queue实时系统
-- Logger日志系统
-- Health健康检查
-- Status状态监控
-- 视频源重连
-- 视频文件输入
-- 工程化模块拆分
+* YOLO工程化部署
+* 多线程视频处理
+* Flask Web开发
+* Linux服务部署
+* Gunicorn + Nginx反向代理
 
 ---
 
-## 视频源配置说明
+## 技术栈
 
-项目通过 `config.py` 中的 `VIDEO_TYPE` 控制视频输入源。
+* Python
+* Flask
+* OpenCV
+* Ultralytics YOLOv8
+* Threading
+* Queue
+* Gunicorn
+* Nginx
+* Linux
 
-### USB摄像头
+---
 
-```python
-VIDEO_TYPE = "camera"
-VIDEO_SOURCE = 0
+## 核心功能
 
-### 本地视频文件
-VIDEO_TYPE = "video"
-VIDEO_SOURCE = "videos/test.mp4"
+### 视频监控
 
-### RTSP网络摄像头
-VIDEO_TYPE = "rtsp"
-RTSP_URL = "rtsp://admin:password@192.168.1.64:554/Streaming/Channels/102"
+* 多路视频流管理
+* YOLO实时目标检测
+* MJPEG视频流推送
+* 视频循环播放
+* 自动重连机制
 
-## 最小依赖说明
+### 系统监控
 
-项目核心依赖：
+* FPS监控
+* 推理耗时统计
+* CPU监控
+* 内存监控
+* Health状态检查
 
-```text
-flask
-opencv-python
-ultralytics
-numpy
+### 告警系统
 
-## 环境变量配置
+支持：
 
-项目支持通过环境变量动态修改参数。
+* LOW_FPS
+* HIGH_MEMORY_USAGE
+* HIGH_CPU_USAGE
+* TOO_MANY_RECONNECT
 
-例如：
+支持告警历史记录查询。
 
-```bash
-set CONF=0.3
-set IMG_SIZE=320
+### 动态摄像头管理
 
+运行过程中支持：
+
+* 添加摄像头
+* 删除摄像头
+
+无需重启服务。
+
+---
 
 ## 项目结构
 
 ```text
 day_17/
-│
 ├── camera/
-│   ├── __init__.py
-│   └── camera_worker.py
-│
+├── core/
 ├── inference/
-│   ├── __init__.py
-│   └── yolo_worker.py
-│
-├── models/
-│   └── yolov8n.pt
-│
-├── static/
-│
+├── manager/
 ├── templates/
-│   └── index.html
-│
 ├── utils/
-│   ├── __init__.py
-│   ├── logger.py
-│   └── shared_data.py
-│
+├── logs/
+├── models/
 ├── videos/
-│   └── test.mp4
+├── scripts/
 │
 ├── app.py
 ├── config.py
-├── requirements.txt
-└──README.md
+├── requirements_min.txt
+└── README.md
+```
 
-## 启动项目
+---
 
-推荐在项目根目录运行：
+## REST API
 
-```bash
-python -m day_17.app
+| 接口                  | 功能        |
+| ------------------- | --------- |
+| GET /               | Dashboard |
+| GET /video/<id>     | 视频流       |
+| GET /status/<id>    | 摄像头状态     |
+| GET /summary        | 系统统计      |
+| GET /cameras        | 摄像头列表     |
+| GET /warnings       | 告警历史      |
+| POST /camera/add    | 添加摄像头     |
+| POST /camera/remove | 删除摄像头     |
+
+---
+
+## 快速启动
 
 ### Windows
 
 ```bash
-run_day17.bat
+python -m day_17.app
+```
 
-## Docker 部署（基础）
+访问：
 
-项目支持Docker部署。
+```text
+http://127.0.0.1:5000
+```
 
-### 构建镜像
+### Linux
+
+创建虚拟环境：
 
 ```bash
-docker build -t day17-yolo .
+python3 -m venv venv
 
-# Progress
+source venv/bin/activate
+```
 
-## v1.1
+安装依赖：
 
-- Multi Camera Support
-- Flask Dashboard
-- System Monitoring
-- Health Check
-- Warning System
-- Log Viewer
-- Linux Deployment
-- Gunicorn Deployment
+```bash
+pip install -r day_17/requirements_min.txt
+```
 
-Stress Test:
+启动项目：
 
-1 Camera -> 20 FPS
-2 Camera -> 11 FPS
-3 Camera -> 9 FPS
+```bash
+python -m day_17.app
+```
 
+---
 
+## Gunicorn 部署
+
+启动：
+
+```bash
+./day_17/scripts/start_gunicorn.sh
+```
+
+重启：
+
+```bash
+./day_17/scripts/restart_gunicorn.sh
+```
+
+停止：
+
+```bash
+./day_17/scripts/stop.sh
+```
+
+查看状态：
+
+```bash
+./day_17/scripts/status.sh
+```
+
+---
+
+## Nginx 反向代理
+
+项目部署于 Ubuntu 环境。
+
+使用：
+
+```text
+Nginx → Gunicorn → Flask → YOLO Service
+```
+
+访问地址：
+
+```text
+http://10.10.10.132
+```
+
+无需手动输入：
+
+```text
+:5000
+```
+
+实现通过 Nginx 将 80 端口反向代理到 Gunicorn 的 5000 端口。
+
+---
+
+## 性能测试
+
+| 摄像头数量 | 平均FPS |
+| ----- | ----- |
+| 1 路   | 20    |
+| 2 路   | 11    |
+| 3 路   | 9     |
+| 4 路   | 7     |
+
+测试环境：
+
+* Ubuntu
+* Python 3.10
+* YOLOv8n
+
+---
+
+## 项目亮点
+
+* 多线程视频处理架构
+* Queue实时处理机制
+* 动态摄像头管理
+* 告警系统
+* 日志系统
+* Linux部署
+* Gunicorn部署
+* Nginx反向代理
+* REST API设计
+
+---
+
+## Future Work
+
+* WebSocket实时推送
+* RTSP摄像头支持优化
+* Docker部署
+* 告警持久化存储
+* 目标跟踪（ByteTrack）
+* 数据库集成
+
+---
+
+## 项目成果
+
+项目已完成：
+
+* 多路视频监控
+* 动态摄像头管理
+* 实时目标检测
+* Dashboard监控面板
+* 告警中心
+* Linux部署
+* Gunicorn部署
+* Nginx反向代理
+
+具备基本的视频监控平台能力，可作为 AI/CV 工程方向实习项目展示。
