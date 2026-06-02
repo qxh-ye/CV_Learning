@@ -11,6 +11,8 @@ from day_17.config import SLEEP_TIME, MEMORY_WARNING_MB, CPU_WARNING_PERCENT, FP
 from day_17.config import HOST, PORT, DEBUG
 from day_17.manager.camera_manager import CameraManager
 
+from day_17.utils.warning_manager import get_warnings,add_warning
+
 
 
 app = Flask(__name__)
@@ -113,6 +115,12 @@ def cameras():
         }
         for context in manager.get_all_contexts()
     ])
+
+@app.route("/warnings")
+def warnings():
+    return jsonify(
+        get_warnings()
+    )
 
 @app.route("/summary")
 def summary():
@@ -259,6 +267,15 @@ def status(stream_id):
 
     warning_message = ",".join(warning_messages) if warning_messages else "None"
 
+    if (warning_message != "None" and warning_message != context.warning_message):
+        add_warning(
+            context.camera_config["name"],
+            warning_message
+
+        )
+    context.warning_message = warning_message
+
+
     if context.source_status != "running":
         health_status = "ERROR"
     elif warning_message != "None":
@@ -292,7 +309,7 @@ def status(stream_id):
         "start_datetime": context.start_datetime,
         "uptime_minute": uptime_minute,
         "detect_per_second": detect_per_second,
-        "warning_message": warning_message
+        "warning_message": context.warning_message
     })
 
 
